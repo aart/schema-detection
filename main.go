@@ -189,7 +189,7 @@ func main() {
 
 	fileNames := []string{"./test1.ndjson", "./test2.ndjson", "./test3.ndjson"}
 
-	numberOfWokers := len(fileNames) * 5
+	numberOfWokers := len(fileNames) * 10
 	schema := Schema{}
 	channel := make(chan Line, 1000000)
 
@@ -203,6 +203,7 @@ func main() {
 		go func() {
 			defer wg.Done()
 			ScanFile(f, channel)
+
 		}()
 	}
 	wg.Wait()
@@ -225,6 +226,6 @@ func main() {
 	fmt.Println(string(d)) //TODO
 
 	elapsed := time.Since(start)
-	fmt.Printf("Elapsed time: %s", elapsed)
-
+	fmt.Println("Total Elapsed time: ", elapsed)
+	fmt.Println("Schema Lenght: ", len(bqSchema))
 }
