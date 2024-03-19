@@ -187,7 +187,7 @@ func main() {
 
 	start := time.Now()
 
-	fileNames := []string{"./test1.ndjson", "./test2.ndjson", "./test3.ndjson"}
+	fileNames := []string{"./test1.ndjson", "./test2.ndjson", "./test3.ndjson", "./test4.ndjson", "./test5.ndjson"}
 
 	numberOfWokers := len(fileNames) * 10
 	schema := Schema{}
