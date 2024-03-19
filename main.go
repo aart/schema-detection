@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	mu sync.RWMutex
+	mu sync.Mutex
 )
 
 type Schema []FieldSchema
@@ -117,17 +117,14 @@ func TraverseValueMap(workerID int, schema *Schema, inputMap *map[string]interfa
 
 	for k, v := range *inputMap {
 
+		if Exists(schema, k) {
+			continue
+		}
+
 		inferredType, repeated, err := InferType(v)
 		if err != nil {
 			return err
 		}
-
-		mu.RLock()
-		if Exists(schema, k) {
-			mu.RUnlock()
-			continue
-		}
-		mu.RUnlock()
 
 		if inferredType == bigquery.RecordFieldType && !repeated {
 			nestedSchema := make(Schema, 0)
@@ -170,25 +167,12 @@ func WorkerProcess(workerID int, schema *Schema, channel chan Line) {
 	}
 }
 
-func main() {
-
-	fileName := "./test.ndjson"
-
-	numberOfWokers := 10
-	schema := Schema{}
-
-	channel := make(chan Line, 10000)
-
-	for id := range numberOfWokers {
-		go WorkerProcess(id, &schema, channel)
-	}
-
+func ScanFile(fileName string, channel chan Line) {
 	readFile, err := os.Open(fileName)
 	if err != nil {
 		fmt.Println(err) //TODO
 	}
 	defer readFile.Close()
-
 	fileScanner := bufio.NewScanner(readFile)
 	fileScanner.Split(bufio.ScanLines)
 
@@ -197,8 +181,39 @@ func main() {
 		channel <- Line{TextLine: fileScanner.Text(), Trace: Traceback{File: fileName, Line: lineNumber}}
 		lineNumber++
 	}
+}
 
-	time.Sleep(5 * time.Second)
+func main() {
+
+	start := time.Now()
+
+	fileNames := []string{"./test1.ndjson", "./test2.ndjson", "./test3.ndjson"}
+
+	numberOfWokers := len(fileNames) * 5
+	schema := Schema{}
+	channel := make(chan Line, 1000000)
+
+	for id := range numberOfWokers {
+		go WorkerProcess(id, &schema, channel)
+	}
+
+	var wg sync.WaitGroup
+	for _, f := range fileNames {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			ScanFile(f, channel)
+		}()
+	}
+	wg.Wait()
+
+	for {
+		if len(channel) > 1 {
+			time.Sleep(1 * time.Millisecond)
+		} else {
+			break
+		}
+	}
 
 	bqSchema := GenerateBigquerySchema(schema)
 
@@ -208,5 +223,8 @@ func main() {
 	}
 
 	fmt.Println(string(d)) //TODO
+
+	elapsed := time.Since(start)
+	fmt.Printf("Elapsed time: %s", elapsed)
 
 }
