@@ -41,7 +41,12 @@ func GenerateBigquerySchema(schema Schema) bigquery.Schema {
 
 	bigquerySchema := bigquery.Schema{}
 	for _, f := range schema {
-		bigquerySchema = append(bigquerySchema, &bigquery.FieldSchema{Name: f.Name, Type: f.Type, Repeated: f.Repeated, Required: f.Required})
+		if f.Type == bigquery.RecordFieldType && !f.Repeated {
+			nestedSchema := GenerateBigquerySchema(f.Schema)
+			bigquerySchema = append(bigquerySchema, &bigquery.FieldSchema{Name: f.Name, Type: f.Type, Schema: nestedSchema, Repeated: f.Repeated, Required: f.Required})
+		} else {
+			bigquerySchema = append(bigquerySchema, &bigquery.FieldSchema{Name: f.Name, Type: f.Type, Repeated: f.Repeated, Required: f.Required})
+		}
 	}
 	return bigquerySchema
 }
@@ -124,9 +129,25 @@ func TraverseValueMap(workerID int, schema *Schema, inputMap *map[string]interfa
 		}
 		mu.RUnlock()
 
-		err = SyncAppend(schema, FieldSchema{Name: k, Type: inferredType, Repeated: repeated, Trace: Traceback{File: trace.File, Line: trace.Line}})
-		if err != nil {
-			return err
+		if inferredType == bigquery.RecordFieldType && !repeated {
+			nestedSchema := make(Schema, 0)
+			nestedMap, ok := v.(map[string]interface{})
+			if !ok {
+				fmt.Println(workerID, "type assertion error on map[string]interface{}") //TODO
+			}
+			err := TraverseValueMap(workerID, &nestedSchema, &nestedMap, trace)
+			if err != nil {
+				return err
+			}
+			err = SyncAppend(schema, FieldSchema{Name: k, Type: inferredType, Repeated: repeated, Schema: nestedSchema, Trace: trace})
+			if err != nil {
+				return err
+			}
+		} else {
+			err = SyncAppend(schema, FieldSchema{Name: k, Type: inferredType, Repeated: repeated, Trace: trace})
+			if err != nil {
+				return err
+			}
 		}
 
 	}
@@ -177,7 +198,7 @@ func main() {
 		lineNumber++
 	}
 
-	time.Sleep(2 * time.Second)
+	time.Sleep(5 * time.Second)
 
 	bqSchema := GenerateBigquerySchema(schema)
 
