@@ -104,7 +104,7 @@ func Exists(schema *Schema, fieldName string) bool {
 	return false
 }
 
-func SyncAppend(schema *Schema, field FieldSchema) error {
+func MutexAppend(schema *Schema, field FieldSchema) error {
 	mu.Lock()
 	if !Exists(schema, field.Name) {
 		*schema = append(*schema, field)
@@ -113,7 +113,7 @@ func SyncAppend(schema *Schema, field FieldSchema) error {
 	return nil
 }
 
-func TraverseValueMap(workerID int, schema *Schema, inputMap *map[string]interface{}, trace Traceback) error {
+func TraverseValueMap(schema *Schema, inputMap *map[string]interface{}, trace Traceback) error {
 
 	for k, v := range *inputMap {
 
@@ -130,18 +130,18 @@ func TraverseValueMap(workerID int, schema *Schema, inputMap *map[string]interfa
 			nestedSchema := make(Schema, 0)
 			nestedMap, ok := v.(map[string]interface{})
 			if !ok {
-				fmt.Println(workerID, "type assertion error on map[string]interface{}") //TODO
+				fmt.Println("type assertion error on map[string]interface{}") //TODO
 			}
-			err := TraverseValueMap(workerID, &nestedSchema, &nestedMap, trace)
+			err := TraverseValueMap(&nestedSchema, &nestedMap, trace)
 			if err != nil {
 				return err
 			}
-			err = SyncAppend(schema, FieldSchema{Name: k, Type: inferredType, Repeated: repeated, Schema: nestedSchema, Trace: trace})
+			err = MutexAppend(schema, FieldSchema{Name: k, Type: inferredType, Repeated: repeated, Schema: nestedSchema, Trace: trace})
 			if err != nil {
 				return err
 			}
 		} else {
-			err = SyncAppend(schema, FieldSchema{Name: k, Type: inferredType, Repeated: repeated, Trace: trace})
+			err = MutexAppend(schema, FieldSchema{Name: k, Type: inferredType, Repeated: repeated, Trace: trace})
 			if err != nil {
 				return err
 			}
@@ -151,16 +151,16 @@ func TraverseValueMap(workerID int, schema *Schema, inputMap *map[string]interfa
 	return nil
 }
 
-func WorkerProcess(workerID int, schema *Schema, channel chan Line) {
+func Worker(schema *Schema, channel chan Line) {
 	var value interface{}
 	for {
 		line := <-channel
 		json.Unmarshal([]byte(line.TextLine), &value)
 		valueMap, ok := value.(map[string]interface{})
 		if !ok {
-			fmt.Println(workerID, "type assertion error on map[string]interface{}") //TODO
+			fmt.Println("type assertion error on map[string]interface{}") //TODO
 		}
-		err := TraverseValueMap(workerID, schema, &valueMap, line.Trace)
+		err := TraverseValueMap(schema, &valueMap, line.Trace)
 		if err != nil {
 			fmt.Println(err) //TODO
 		}
@@ -187,14 +187,14 @@ func main() {
 
 	start := time.Now()
 
-	fileNames := []string{"./test1.ndjson", "./test2.ndjson", "./test3.ndjson", "./test4.ndjson", "./test5.ndjson"}
+	fileNames := []string{"./benchmark/test1.ndjson", "./benchmark/test2.ndjson", "./benchmark/test3.ndjson", "./benchmark/test4.ndjson", "./benchmark/test5.ndjson"}
 
-	numberOfWokers := len(fileNames) * 10
 	schema := Schema{}
+	numberOfWorkers := len(fileNames) * 10
 	channel := make(chan Line, 1000000)
 
-	for id := range numberOfWokers {
-		go WorkerProcess(id, &schema, channel)
+	for _ = range numberOfWorkers {
+		go Worker(&schema, channel)
 	}
 
 	var wg sync.WaitGroup
@@ -203,7 +203,6 @@ func main() {
 		go func() {
 			defer wg.Done()
 			ScanFile(f, channel)
-
 		}()
 	}
 	wg.Wait()
