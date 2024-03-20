@@ -19,7 +19,7 @@ var runCmd = &cobra.Command{
 		if len(args) == 0 {
 			fmt.Println(">schema run [fileName]. Argument missing")
 		} else {
-			Run(args[0])
+			Run(args)
 		}
 	},
 }
@@ -40,15 +40,18 @@ func ScanFile(fileName string, channel chan core.Line) {
 	}
 }
 
-func Run(fileName string) {
+func Run(fileNames []string) {
+
+	fmt.Println("starting process")
+	fmt.Println("fan-out: ", fanOut)
+	fmt.Println("buffer-size: ", bufferSize)
+	fmt.Println("output-file: ", outputFile)
 
 	start := time.Now()
-	//fileNames := []string{"./ndjson/benchmark/test1.ndjson", "./ndjson/benchmark/test2.ndjson", "./ndjson/benchmark/test3.ndjson", "./ndjson/benchmark/test4.ndjson", "./ndjson/benchmark/test5.ndjson"}
-	fileNames := []string{fileName}
 
 	schema := core.Schema{}
-	numberOfWorkers := len(fileNames) * 10
-	channel := make(chan core.Line, 1000000)
+	numberOfWorkers := len(fileNames) * fanOut
+	channel := make(chan core.Line, bufferSize)
 
 	for _ = range numberOfWorkers {
 		go core.Worker(&schema, channel)
@@ -80,10 +83,15 @@ func Run(fileName string) {
 		panic("fatal schema conversion to JSON: " + err.Error())
 	}
 
-	fmt.Println("bigquery schema:")
-	fmt.Println(string(d)) //TODO
-
 	elapsed := time.Since(start)
 	fmt.Println("total elapsed time: ", elapsed)
-	fmt.Println("schema lenght: ", len(bqSchema))
+	fmt.Println("schema length: ", len(bqSchema))
+
+	fmt.Println("bigquery schema generated: ", outputFile)
+
+	err = os.WriteFile("./"+outputFile, d, 0644)
+	if err != nil {
+		panic("error writing schema to output file: " + err.Error())
+	}
+
 }
