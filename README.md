@@ -1,21 +1,17 @@
-##Design
+## Design
 
-The technical design overview is visualized in the design document (design.pdf).
+The technical design is visualized in the design document (design.pdf).
 
-##Design Principles:
+## Design Principles:
 - Performance through concurrency
 - Enforce consistency checks upstream
 - Fail fast in case of an error
 - Traceback to enable debugging
 
-##Assumptions:
+## Limitations and Constraints:
 - 
 -
 
-##Limitations and Constraints:
--
--
-
-###Not yet supported:
-- 
--
+### Not supported:
+- No handling for the JSON string literal "null".  
+- Distribution
