@@ -1,8 +1,11 @@
-module take-home
+module github.com/aart/schema-detection
 
 go 1.22.0
 
-require cloud.google.com/go/bigquery v1.59.1
+require (
+	cloud.google.com/go/bigquery v1.59.1
+	github.com/spf13/cobra v1.8.0
+)
 
 require (
 	cloud.google.com/go v0.112.0 // indirect
@@ -21,9 +24,11 @@ require (
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.2 // indirect
 	github.com/googleapis/gax-go/v2 v2.12.0 // indirect
+	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/klauspost/compress v1.16.7 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.5 // indirect
 	github.com/pierrec/lz4/v4 v4.1.18 // indirect
+	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.47.0 // indirect
