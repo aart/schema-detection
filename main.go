@@ -41,7 +41,7 @@ func GenerateBigquerySchema(schema Schema) bigquery.Schema {
 
 	bigquerySchema := bigquery.Schema{}
 	for _, f := range schema {
-		if f.Type == bigquery.RecordFieldType && !f.Repeated {
+		if f.Type == bigquery.RecordFieldType {
 			nestedSchema := GenerateBigquerySchema(f.Schema)
 			bigquerySchema = append(bigquerySchema, &bigquery.FieldSchema{Name: f.Name, Type: f.Type, Schema: nestedSchema, Repeated: f.Repeated, Required: f.Required})
 		} else {
@@ -142,7 +142,6 @@ func TraverseValueMap(schema *Schema, inputMap *map[string]interface{}, trace Tr
 			if !ok {
 				return fmt.Errorf("fatal type assertion on repeated field: %s", k)
 			}
-			fmt.Println(nestedMap)
 			err := TraverseValueMap(&nestedSchema, &nestedMap, trace) // Recursive call
 			if err != nil {
 				return fmt.Errorf(err.Error()+" on field: %s", k)
@@ -202,7 +201,7 @@ func main() {
 	start := time.Now()
 
 	//fileNames := []string{"./benchmark/test1.ndjson", "./benchmark/test2.ndjson", "./benchmark/test3.ndjson", "./benchmark/test4.ndjson", "./benchmark/test5.ndjson"}
-	fileNames := []string{"./test/test2.ndjson"}
+	fileNames := []string{"./test/test1.ndjson"}
 
 	schema := Schema{}
 	numberOfWorkers := len(fileNames) * 10
