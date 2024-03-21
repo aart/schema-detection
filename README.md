@@ -5,7 +5,7 @@ The technical design of the core is visualized:
 
 ### Key Design Principles:
 - Performance through concurrency (using golang channel primitives)
-- Big data support through splitted input files (processed in parallel)
+- Big data support through splitted input files (processed in parallel & sampling)
 - Enforce consistency checks upstream (avoid things fail downstream)
 - Fail fast in case of an error
 - File position traceback to enable debugging
