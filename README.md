@@ -28,3 +28,35 @@ The technical design of the core is visualized in the design blueprint (design.p
 - Incomplete support for string-wrapped types: Timestamp, Time, Date, Geo-types, ...
 - Sampling instead of full line-by-line processing
 - Deployment on Dataflow
+
+### Example Usage
+
+#### Help command
+> ./schemagen help                                                                                                            
+            Bigquery schema generator from ndjson input files. More info at: https://github.com/aart/schema-detection
+
+            Usage:
+            schemagen [flags]
+            schemagen [command]
+
+            Available Commands:
+            completion  Generate the autocompletion script for the specified shell
+            help        Help about any command
+            run
+
+            Flags:
+                --buffer-size int      todo (default 1000000)
+                --fan-out int          todo (default 1)
+            -h, --help                 help for schemagen
+                --output-file string   todo (default "schema.json")
+
+            Use "schemagen [command] --help" for more information about a command.
+
+            The project includes some expample data:
+
+#### Usage
+> ./schemagen run ./ndjson/test0.ndjson  --fan-out=2 --buffer-size=1000000 --output-file=schema.json
+
+#### For multiple input files, use:
+
+>./schemagen run ./ndjson/benchmark/test1.ndjson ./ndjson/benchmark/test2.ndjson ./ndjson/benchmark/test3.ndjson ./ndjson/benchmark/test4.ndjson ./ndjson/benchmark/test5.ndjson --fan-out=5 --buffer-size=1000000

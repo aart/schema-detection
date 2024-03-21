@@ -16,7 +16,7 @@ var (
 func init() {
 
 	rootCmd.PersistentFlags().StringVar(&outputFile, "output-file", "schema.json", "todo")
-	rootCmd.PersistentFlags().IntVar(&fanOut, "fan-out", 1, "todo")
+	rootCmd.PersistentFlags().IntVar(&fanOut, "fan-out", 5, "todo")
 	rootCmd.PersistentFlags().Int64Var(&bufferSize, "buffer-size", 1000000, "todo")
 	rootCmd.AddCommand(runCmd)
 }
