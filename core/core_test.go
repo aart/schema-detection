@@ -21,7 +21,7 @@ func TestRequirement(t *testing.T) {
 			t.Error(err)
 		}
 	}
-	if len(schema) != 3 {
+	if len(schema) != 4 {
 		t.Error("length doesn't match")
 	}
 
