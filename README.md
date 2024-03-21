@@ -9,6 +9,7 @@ The technical design of the core is visualized:
 - Enforce consistency checks upstream
 - Fail fast in case of an error
 - File position traceback to enable debugging
+- Architect for reusability (generate schema for AlloyDB, Spanner, ...)
 
 ### Constraints:
 - A process will generate one schema. To enable generation of different schemas seperate processes need to be instantiated.
