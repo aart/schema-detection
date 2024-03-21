@@ -48,10 +48,10 @@ The technical design of the core is visualized:
             run
 
             Flags:
-                --buffer-size int      todo (default 1000000)
-                --fan-out int          todo (default 1)
+                --buffer-size int           (default 1000000)
+                --fan-out int          t    (default 1)
             -h, --help                 help for schemagen
-                --output-file string   todo (default "schema.json")
+                --output-file string        (default "schema.json")
 
             Use "schemagen [command] --help" for more information about a command.
 
