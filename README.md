@@ -5,21 +5,21 @@ The technical design of the core is visualized:
 
 ### Key Design Principles:
 - Performance through concurrency (using golang channel primitives)
-- Big data support through splitted input files
-- Enforce consistency checks upstream
+- Big data support through splitted input files (processed in parallel)
+- Enforce consistency checks upstream (avoid things fail downstream)
 - Fail fast in case of an error
 - File position traceback to enable debugging
-- Architect for reusability (generate schema for AlloyDB, Spanner, ...)
+- Architect for reusability (generate other destination schema for AlloyDB, Spanner, ...)
 
 ### Constraints:
 - A process will generate one schema. To enable generation of different schemas seperate processes need to be instantiated.
 
 ### Features:
-- Recursively nested and repeated fields
+- Recursively traverse nested and repeated fields
 - Core functionality is structured in a reusable packages
-- Command line interface (CLI) enabling configurability
+- Command line interface (CLI) with enabling configurability
 - Single binary executable. Should play well together with Google CLI tools like gcloud and bq.
-- Basic test automation
+- Basic test case automation
 
 ### Not supported yet:
 - API integration with Google Cloud (Cloud Storage, Bigquery)
