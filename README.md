@@ -1,6 +1,7 @@
 ## Design
 
 The technical design of the core is visualized in the design blueprint (design.pdf).
+![blueprint](design.pdf)
 
 ### Key Design Principles:
 - Performance through concurrency (using golang channel primitives)
@@ -32,7 +33,8 @@ The technical design of the core is visualized in the design blueprint (design.p
 ### Example Usage
 
 #### Help command
-> ./schemagen help                                                                                                            
+> ./schemagen help           
+
             Bigquery schema generator from ndjson input files. More info at: https://github.com/aart/schema-detection
 
             Usage:
