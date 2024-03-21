@@ -40,6 +40,16 @@ func ScanFile(fileName string, channel chan core.Line) {
 	}
 }
 
+func Worker(schema *core.Schema, channel chan core.Line) {
+	for {
+		line := <-channel
+		err := core.ProcessLine(schema, line)
+		if err != nil {
+			panic(err)
+		}
+	}
+}
+
 func Run(fileNames []string) {
 
 	fmt.Println("starting process")
@@ -54,7 +64,7 @@ func Run(fileNames []string) {
 	channel := make(chan core.Line, bufferSize)
 
 	for _ = range numberOfWorkers {
-		go core.Worker(&schema, channel)
+		go Worker(&schema, channel)
 	}
 
 	var wg sync.WaitGroup

@@ -20,10 +20,10 @@ The technical design of the core is visualized in the design blueprint (design.p
 - Basic test automation (to be further extended)
 
 ### Not supported yet:
+- API integration with Google Cloud (Cloud Storage, Bigquery, Dataflow)
 - Constraint relaxation for the "Required" attribute 
 - No handling for the JSON string literal "null"
 - Distribution or clustered deployment
 - Schema inference by parsing through repeated records (now the nested schema is based on the first element)
-- API integration with Google Cloud (Cloud Storage, Bigquery, Dataflow)
 - Incomplete support for string-wrapped types: Timestamp, Time, Date, Geo-types, ...
 - Sampling instead of full line-by-line processing
