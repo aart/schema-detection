@@ -1,7 +1,7 @@
 ## Design
 
-The technical design of the core is visualized in the design blueprint (design.pdf).
-![blueprint](design.pdf)
+The technical design of the core is visualized: 
+![blueprint](design.png)
 
 ### Key Design Principles:
 - Performance through concurrency (using golang channel primitives)
