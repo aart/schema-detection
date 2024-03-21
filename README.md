@@ -49,7 +49,7 @@ The technical design of the core is visualized:
 
             Flags:
                 --buffer-size int           (default 1000000)
-                --fan-out int          t    (default 1)
+                --fan-out int          t    (default 5)
             -h, --help                 help for schemagen
                 --output-file string        (default "schema.json")
 
