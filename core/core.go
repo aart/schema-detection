@@ -162,15 +162,15 @@ func ProcessLine(schema *Schema, line Line) error {
 	var value interface{}
 	err := json.Unmarshal([]byte(line.TextLine), &value)
 	if err != nil {
-		fmt.Errorf("fatal unmarshal at position: " + line.Trace.File + " " + strconv.FormatInt(line.Trace.Line, 10))
+		return fmt.Errorf("fatal unmarshal at position: " + line.Trace.File + " " + strconv.FormatInt(line.Trace.Line, 10))
 	}
 	valueMap, ok := value.(map[string]interface{})
 	if !ok {
-		fmt.Errorf("fatal type assertion error at position: " + line.Trace.File + " " + strconv.FormatInt(line.Trace.Line, 10))
+		return fmt.Errorf("fatal type assertion error at position: " + line.Trace.File + " " + strconv.FormatInt(line.Trace.Line, 10))
 	}
 	err = TraverseValueMap(schema, &valueMap, line.Trace)
 	if err != nil {
-		fmt.Errorf("error: " + err.Error() + " at position: " + line.Trace.File + " " + strconv.FormatInt(line.Trace.Line, 10))
+		return fmt.Errorf("error: " + err.Error() + " at position: " + line.Trace.File + " " + strconv.FormatInt(line.Trace.Line, 10))
 	}
 	return nil
 }
