@@ -8,9 +8,10 @@ import (
 )
 
 var (
-	outputFile string
-	fanOut     int
-	bufferSize int64
+	outputFile         string
+	fanOut             int
+	bufferSize         int64
+	samplingPercentage int
 )
 
 func init() {
@@ -18,6 +19,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&outputFile, "output-file", "schema.json", "")
 	rootCmd.PersistentFlags().IntVar(&fanOut, "fan-out", 5, "")
 	rootCmd.PersistentFlags().Int64Var(&bufferSize, "buffer-size", 1000000, "")
+	rootCmd.PersistentFlags().IntVar(&samplingPercentage, "sampling-percentage", 100, "")
 	rootCmd.AddCommand(runCmd)
 }
 

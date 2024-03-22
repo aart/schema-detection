@@ -3,14 +3,18 @@ package core
 import (
 	"encoding/json"
 	"fmt"
+	"math/rand/v2"
 	"strconv"
 	"sync"
+	"sync/atomic"
 
 	"cloud.google.com/go/bigquery"
 )
 
 var (
-	mu sync.Mutex
+	mu                   sync.Mutex
+	TotalLineCounter     atomic.Uint64
+	ProcessedLineCounter atomic.Uint64
 )
 
 type Schema []FieldSchema
@@ -158,19 +162,24 @@ func TraverseValueMap(schema *Schema, inputMap *map[string]interface{}, trace Tr
 	return nil
 }
 
-func ProcessLine(schema *Schema, line Line) error {
-	var value interface{}
-	err := json.Unmarshal([]byte(line.TextLine), &value)
-	if err != nil {
-		return fmt.Errorf("fatal unmarshal at position: " + line.Trace.File + " " + strconv.FormatInt(line.Trace.Line, 10))
+func ProcessLine(schema *Schema, line Line, samplingPercentage int) error {
+
+	if rand.IntN(100) < samplingPercentage {
+		var value interface{}
+		err := json.Unmarshal([]byte(line.TextLine), &value)
+		if err != nil {
+			return fmt.Errorf("fatal unmarshal at position: " + line.Trace.File + " " + strconv.FormatInt(line.Trace.Line, 10))
+		}
+		valueMap, ok := value.(map[string]interface{})
+		if !ok {
+			return fmt.Errorf("fatal type assertion error at position: " + line.Trace.File + " " + strconv.FormatInt(line.Trace.Line, 10))
+		}
+		err = TraverseValueMap(schema, &valueMap, line.Trace)
+		if err != nil {
+			return fmt.Errorf("error: " + err.Error() + " at position: " + line.Trace.File + " " + strconv.FormatInt(line.Trace.Line, 10))
+		}
+		ProcessedLineCounter.Add(1)
 	}
-	valueMap, ok := value.(map[string]interface{})
-	if !ok {
-		return fmt.Errorf("fatal type assertion error at position: " + line.Trace.File + " " + strconv.FormatInt(line.Trace.Line, 10))
-	}
-	err = TraverseValueMap(schema, &valueMap, line.Trace)
-	if err != nil {
-		return fmt.Errorf("error: " + err.Error() + " at position: " + line.Trace.File + " " + strconv.FormatInt(line.Trace.Line, 10))
-	}
+	TotalLineCounter.Add(1)
 	return nil
 }

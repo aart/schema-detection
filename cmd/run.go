@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strconv"
 	"sync"
 	"time"
 
@@ -38,12 +39,13 @@ func ScanFile(fileName string, channel chan core.Line) {
 		channel <- core.Line{TextLine: fileScanner.Text(), Trace: core.Traceback{File: fileName, Line: lineNumber}}
 		lineNumber++
 	}
+	return
 }
 
 func Worker(schema *core.Schema, channel chan core.Line) {
 	for {
 		line := <-channel
-		err := core.ProcessLine(schema, line)
+		err := core.ProcessLine(schema, line, samplingPercentage)
 		if err != nil {
 			panic(err)
 		}
@@ -56,6 +58,7 @@ func Run(fileNames []string) {
 	fmt.Println("fan-out: ", fanOut)
 	fmt.Println("buffer-size: ", bufferSize)
 	fmt.Println("output-file: ", outputFile)
+	fmt.Println("sampling-percentage: ", samplingPercentage)
 
 	start := time.Now()
 
@@ -94,8 +97,6 @@ func Run(fileNames []string) {
 	}
 
 	elapsed := time.Since(start)
-	fmt.Println("total elapsed time: ", elapsed)
-	fmt.Println("schema length: ", len(bqSchema))
 
 	fmt.Println("bigquery schema generated: ", outputFile)
 
@@ -104,4 +105,10 @@ func Run(fileNames []string) {
 		panic("error writing schema to output file: " + err.Error())
 	}
 
+	c := core.TotalLineCounter.Load()
+	e := core.ProcessedLineCounter.Load()
+	fmt.Println("schema length: ", len(bqSchema))
+	fmt.Println("total elapsed time: ", elapsed)
+	fmt.Println("total lines counted:", strconv.FormatInt(int64(c), 10))
+	fmt.Println("total lines processed:", strconv.FormatInt(int64(e), 10))
 }
