@@ -16,7 +16,7 @@ func TestRequirement(t *testing.T) {
 
 	schema := Schema{}
 	for _, line := range lines {
-		err := ProcessLine(&schema, Line{TextLine: line, Trace: Traceback{}})
+		err := ProcessLine(&schema, Line{TextLine: line, Trace: Traceback{}}, 100)
 		if err != nil {
 			t.Error(err)
 		}
