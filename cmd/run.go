@@ -31,13 +31,20 @@ func ScanFile(fileName string, channel chan core.Line) {
 		panic("unable to open file: " + err.Error())
 	}
 	defer readFile.Close()
+
 	fileScanner := bufio.NewScanner(readFile)
 	fileScanner.Split(bufio.ScanLines)
-
 	lineNumber := int64(1)
-	for fileScanner.Scan() {
-		channel <- core.Line{TextLine: fileScanner.Text(), Trace: core.Traceback{File: fileName, Line: lineNumber}}
-		lineNumber++
+	for {
+		ok := fileScanner.Scan()
+		if ok {
+			channel <- core.Line{TextLine: fileScanner.Text(), Trace: core.Traceback{File: fileName, Line: lineNumber}}
+			lineNumber++
+		} else {
+			//TODO: fix the error: bufio.Scanner: token too long >> solution? increase buffer
+			return
+			//panic(fileScanner.Err())
+		}
 	}
 	return
 }

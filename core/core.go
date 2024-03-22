@@ -163,7 +163,6 @@ func TraverseValueMap(schema *Schema, inputMap *map[string]interface{}, trace Tr
 }
 
 func ProcessLine(schema *Schema, line Line, samplingPercentage int) error {
-
 	if rand.IntN(100) < samplingPercentage {
 		var value interface{}
 		err := json.Unmarshal([]byte(line.TextLine), &value)
