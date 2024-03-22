@@ -28,7 +28,6 @@ The technical design of the core is visualized:
 - Distribution or clustered deployment
 - Schema inference by parsing through repeated records (now the nested schema is based on the first element)
 - Incomplete support for string-wrapped types: Timestamp, Time, Date, Geo-types, ...
-- Sampling instead of full line-by-line processing
 - Deployment on Dataflow
 
 ### Example Usage
@@ -50,6 +49,7 @@ The technical design of the core is visualized:
             Flags:
                 --buffer-size int           (default 1000000)
                 --fan-out int          t    (default 5)
+                --sampling-percentage int   (default 100)
             -h, --help                 help for schemagen
                 --output-file string        (default "schema.json")
 
