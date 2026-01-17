@@ -33,13 +33,13 @@ The technical design of the core is visualized:
 ### Example Usage
 
 #### Help command
-> ./schemagen help           
+> ./schema-detection help           
 
             Bigquery schema generator from ndjson input files. More info at: https://github.com/aart/schema-detection
 
             Usage:
-            schemagen [flags]
-            schemagen [command]
+            schema-detection [flags]
+            schema-detection [command]
 
             Available Commands:
             completion  Generate the autocompletion script for the specified shell
@@ -58,8 +58,8 @@ The technical design of the core is visualized:
             The project includes some expample data:
 
 #### Usage
-> ./schemagen run ./ndjson/test0.ndjson  --fan-out=2 --buffer-size=1000000 --output-file=schema.json
+> ./schema-detection run ./ndjson/test0.ndjson  --fan-out=2 --buffer-size=1000000 --output-file=schema.json
 
 #### For multiple input files, use:
 
->./schemagen run ./ndjson/benchmark/test1.ndjson ./ndjson/benchmark/test2.ndjson ./ndjson/benchmark/test3.ndjson ./ndjson/benchmark/test4.ndjson ./ndjson/benchmark/test5.ndjson --fan-out=5 --buffer-size=1000000
+>./schema-detection run ./ndjson/benchmark/test1.ndjson ./ndjson/benchmark/test2.ndjson ./ndjson/benchmark/test3.ndjson ./ndjson/benchmark/test4.ndjson ./ndjson/benchmark/test5.ndjson --fan-out=5 --buffer-size=1000000
