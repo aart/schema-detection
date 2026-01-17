@@ -24,11 +24,11 @@ func init() {
 }
 
 var rootCmd = &cobra.Command{
-	Use:   "schemagen",
-	Short: "schemagen",
+	Use:   "schema-detection",
+	Short: "schema-detection",
 	Long:  `Bigquery schema generator from ndjson input files. More info at: https://github.com/aart/schema-detection`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("For more info _>schemagen help")
+		fmt.Println("For more info _>schema-detection help")
 	},
 }
 
