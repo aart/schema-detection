@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	mu                   sync.Mutex
+	mu                   sync.RWMutex
 	TotalLineCounter     atomic.Uint64
 	ProcessedLineCounter atomic.Uint64
 )
@@ -39,6 +39,9 @@ type Traceback struct {
 }
 
 func GenerateBigquerySchema(schema Schema) bigquery.Schema {
+
+	mu.RLock()
+	defer mu.RUnlock()
 
 	bigquerySchema := bigquery.Schema{}
 	for _, f := range schema {
@@ -89,6 +92,9 @@ func InferType(value interface{}) (bigquery.FieldType, bool, error) {
 }
 
 func Exists(schema *Schema, fieldName string) bool {
+	mu.RLock()
+	defer mu.RUnlock()
+
 	for _, f := range *schema {
 		if fieldName == f.Name {
 			return true
