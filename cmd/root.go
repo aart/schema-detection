@@ -17,7 +17,7 @@ var (
 func init() {
 
 	rootCmd.PersistentFlags().StringVar(&outputFile, "output-file", "schema.json", "")
-	rootCmd.PersistentFlags().IntVar(&fanOut, "fan-out", 5, "")
+	rootCmd.PersistentFlags().IntVar(&fanOut, "fan-out", 2 "")
 	rootCmd.PersistentFlags().Int64Var(&bufferSize, "buffer-size", 1000000, "")
 	rootCmd.PersistentFlags().IntVar(&samplingPercentage, "sampling-percentage", 100, "")
 	rootCmd.AddCommand(runCmd)

@@ -94,7 +94,6 @@ func InferType(value interface{}) (bigquery.FieldType, bool, error) {
 func Exists(schema *Schema, fieldName string) bool {
 	mu.RLock()
 	defer mu.RUnlock()
-
 	for _, f := range *schema {
 		if fieldName == f.Name {
 			return true
@@ -104,11 +103,13 @@ func Exists(schema *Schema, fieldName string) bool {
 }
 
 func MutexAppend(schema *Schema, field FieldSchema) error {
-	mu.Lock()
+
 	if !Exists(schema, field.Name) {
+		mu.Lock()
 		*schema = append(*schema, field)
+		mu.Unlock()
 	}
-	mu.Unlock()
+
 	return nil
 }
 
